@@ -47,6 +47,9 @@ module top_riscv(
     wire [31:0] imm_val_lui;        // extracted immediate value for load upper immediate instruction (sign extended)
     wire [31:0] imm_val_jump;       // extracted immediate value for jump instruction (sign extended)
     wire [31:0] current_pc;         // register for storing return programme counter
+	wire [31:0]immediate_value_store_temp;
+	wire [31:0]immediate_value_store;
+	wire [4:0] base_addr;
     
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                                 // INSTRUCTION FETCH UNIT // 
@@ -122,7 +125,7 @@ module top_riscv(
                   reg_dst,
                   mem_to_reg,
                   bneq_control,
-                  imm_val_top,
+                  immediate_value_store,
                   instruction_out[24:20],
                   lb,
                   sw,
@@ -142,10 +145,16 @@ module top_riscv(
                   
     assign imm_val_top = {{20{instruction_out[31]}},instruction_out[31:21]};
     assign imm_val_branch_top = {{20{instruction_out[31]}},instruction_out[30:25],instruction_out[11:8],instruction_out[7]};
-    assign imm_val_lui = {{10{instruction_out[31]}},instruction_out[31:12]};
+    assign imm_val_lui = {10'b0,instruction_out[31:12]};
     assign imm_val_jump = {{10{instruction_out[31]}},instruction_out[31:12]};
     assign imm_val = imm_val_top;
+	
+	assign immediate_value_store_temp = {{20{instruction_out[31]}},instruction_out[31:12]};
     
-    
+    assign base_address = instruction_out[19:15];
+	
+	assign immediate_value_store = immediate_value_store_temp + base_address; 
+	
+	
     
     endmodule
